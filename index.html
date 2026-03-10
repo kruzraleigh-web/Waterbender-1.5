@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Waterbender Side-Scroller</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div id="gameShell">
+      <header id="hud">
+        <div class="statBlock">
+          <span>Health</span>
+          <div class="bar"><div id="playerHealthFill" class="fill health"></div></div>
+        </div>
+        <div class="statBlock">
+          <span>Water</span>
+          <div class="bar"><div id="waterFill" class="fill water"></div></div>
+        </div>
+        <div class="meta">
+          <span id="waveLabel">Wave: 1</span>
+          <span id="levelLabel">Level: 1</span>
+          <span id="scoreLabel">Score: 0</span>
+        </div>
+        <button id="restartBtn">Restart</button>
+      </header>
+
+      <canvas id="gameCanvas" width="1200" height="640"></canvas>
+
+      <div id="levelUpPanel" class="panel hidden">
+        <h2>Choose a Waterbending Upgrade</h2>
+        <p>Wave cleared! Pick one move to unlock or improve.</p>
+        <div id="upgradeButtons" class="choices"></div>
+      </div>
+
+      <div id="gameOverPanel" class="panel hidden">
+        <h2>Game Over</h2>
+        <p id="gameOverSummary"></p>
+        <button id="playAgainBtn">Play Again</button>
+      </div>
+
+      <div id="help">
+        <strong>Controls:</strong>
+        WASD = move, Space = jump, Shift while dragging = ice, Mouse drag = water whip/launch,
+        Q = water wave, F = punch/kick combo.
+      </div>
+    </div>
+
+    <script src="game.js"></script>
+  </body>
+</html>

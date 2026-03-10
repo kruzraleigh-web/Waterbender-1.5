@@ -1,0 +1,128 @@
+:root {
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: linear-gradient(#0d1f37, #07111f);
+  color: #f0f7ff;
+}
+
+#gameShell {
+  width: min(1260px, 96vw);
+  margin: 1rem auto;
+  display: grid;
+  gap: 0.75rem;
+}
+
+#hud {
+  background: rgba(6, 15, 30, 0.8);
+  border: 1px solid #2f4b68;
+  border-radius: 10px;
+  padding: 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.statBlock {
+  min-width: 180px;
+}
+
+.bar {
+  width: 200px;
+  max-width: 30vw;
+  height: 14px;
+  background: #1a2d45;
+  border: 1px solid #456687;
+  border-radius: 100px;
+  overflow: hidden;
+}
+
+.fill {
+  height: 100%;
+  width: 100%;
+  transition: width 0.15s linear;
+}
+
+.fill.health {
+  background: linear-gradient(90deg, #2ed760, #95f7b0);
+}
+
+.fill.water {
+  background: linear-gradient(90deg, #39b8ff, #9ce3ff);
+}
+
+.meta {
+  display: flex;
+  gap: 1rem;
+  margin-left: auto;
+}
+
+button {
+  border: 1px solid #8ccfff;
+  background: #18466c;
+  color: #e8f8ff;
+  border-radius: 8px;
+  padding: 0.45rem 0.8rem;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #266292;
+}
+
+#gameCanvas {
+  width: 100%;
+  border-radius: 12px;
+  border: 2px solid #3f5f80;
+  background: linear-gradient(#8ec8ff 0%, #b8ecff 55%, #89c995 56%, #5d9358 100%);
+}
+
+#help {
+  font-size: 0.95rem;
+  background: rgba(8, 18, 30, 0.8);
+  border: 1px solid #2f4b68;
+  border-radius: 8px;
+  padding: 0.5rem 0.8rem;
+}
+
+.panel {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: grid;
+  place-items: center;
+  z-index: 20;
+  text-align: center;
+}
+
+.panel > * {
+  margin: 0.4rem 0;
+}
+
+.panel h2,
+.panel p,
+.choices {
+  background: #0f2238;
+  border: 1px solid #4f86b3;
+  border-radius: 8px;
+  padding: 0.8rem;
+}
+
+.choices {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.hidden {
+  display: none;
+}
