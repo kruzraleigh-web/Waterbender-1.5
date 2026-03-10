@@ -94,7 +94,6 @@ const arrays = {
   structures: [],
   particles: [],
   projectiles: [],
-  waves: [],
   hearts: [],
   waterSources: [],
 };
@@ -275,65 +274,20 @@ function emitParticles(x, y, count, color, spread = 2.7) {
 function performWaterWave() {
   if (!player.abilities.waterWave || player.attackCooldown > 0) return;
   player.attackCooldown = 40;
-
-  // Spawn a visible wave sprite that travels in the direction the player faces.
-  arrays.waves.push({
-    x: player.x + player.w / 2 + player.facing * 24,
-    y: player.y + player.h * 0.65,
-    w: player.abilities.strongerWave ? 96 : 82,
-    h: player.abilities.strongerWave ? 48 : 40,
-    vx: player.facing * (player.abilities.strongerWave ? 11 : 9),
-    life: 34,
-    damage: player.abilities.strongerWave ? 16 : 10,
-    push: player.abilities.strongerWave ? 8 : 6,
-    hitSet: new Set(),
-  });
-
-  emitParticles(player.x + player.w / 2 + player.facing * 16, player.y + player.h * 0.65, 16, '#5bd9ff');
-}
-
-function updateWaves() {
-  for (const wave of arrays.waves) {
-    wave.x += wave.vx;
-    wave.life--;
-
-    // Hit enemies once per wave object to avoid stunlocking.
-    for (const e of arrays.enemies) {
-      if (wave.hitSet.has(e)) continue;
-
-      if (e.boss) {
-        const bossHitbox = { x: e.x, y: e.y, w: e.w, h: e.h };
-        const waveHitbox = { x: wave.x - wave.w / 2, y: wave.y - wave.h / 2, w: wave.w, h: wave.h };
-        if (rectsOverlap(waveHitbox, bossHitbox)) {
-          e.hp -= wave.damage * 0.5;
-          e.vx += Math.sign(wave.vx) * 0.5;
-          wave.hitSet.add(e);
-          emitParticles(wave.x, wave.y, 8, '#8ad8ff');
-        }
-        continue;
-      }
-
-      const waveHitbox = { x: wave.x - wave.w / 2, y: wave.y - wave.h / 2, w: wave.w, h: wave.h };
-      if (rectsOverlap(waveHitbox, e)) {
-        e.hp -= wave.damage;
-        e.vx += Math.sign(wave.vx) * wave.push;
-        e.vy -= 3;
-        wave.hitSet.add(e);
-        emitParticles(e.x + e.w / 2, e.y + e.h / 2, 12, '#67ceff');
-      }
-    }
-
-    // Waves lose energy when colliding with structures.
-    for (const s of arrays.structures) {
-      const waveHitbox = { x: wave.x - wave.w / 2, y: wave.y - wave.h / 2, w: wave.w, h: wave.h };
-      if (rectsOverlap(waveHitbox, s)) {
-        wave.vx *= -0.35;
-        wave.life -= 6;
-      }
+  const range = player.abilities.strongerWave ? 180 : 130;
+  const damage = player.abilities.strongerWave ? 16 : 10;
+  for (const e of arrays.enemies) {
+    const center = { x: e.x + e.w / 2, y: e.y + e.h / 2 };
+    const playerCenter = { x: player.x + player.w / 2, y: player.y + player.h / 2 };
+    const d = distance(center, playerCenter);
+    if (d < range) {
+      e.hp -= damage;
+      const dir = Math.sign(center.x - playerCenter.x) || 1;
+      e.vx += dir * 6;
+      e.vy -= 4;
+      emitParticles(center.x, center.y, 14, '#5bd9ff');
     }
   }
-
-  arrays.waves = arrays.waves.filter((wave) => wave.life > 0 && wave.x > -120 && wave.x < WORLD.width + 120);
 }
 
 function punchKickAttack() {
@@ -677,35 +631,6 @@ function updateParticles() {
   arrays.particles = arrays.particles.filter((p) => p.life > 0);
 }
 
-function drawWaveSprite(wave) {
-  const dir = Math.sign(wave.vx) || 1;
-  const x = wave.x;
-  const y = wave.y;
-  const w = wave.w;
-  const h = wave.h;
-
-  // Main wave body
-  const grad = ctx.createLinearGradient(x - (w / 2) * dir, y, x + (w / 2) * dir, y);
-  grad.addColorStop(0, 'rgba(167, 235, 255, 0.85)');
-  grad.addColorStop(1, 'rgba(33, 163, 255, 0.75)');
-  ctx.fillStyle = grad;
-
-  ctx.beginPath();
-  ctx.moveTo(x - (w / 2) * dir, y + h * 0.45);
-  ctx.quadraticCurveTo(x - (w * 0.1) * dir, y - h * 0.7, x + (w / 2) * dir, y + h * 0.45);
-  ctx.quadraticCurveTo(x + (w * 0.15) * dir, y + h * 0.1, x - (w / 2) * dir, y + h * 0.45);
-  ctx.closePath();
-  ctx.fill();
-
-  // Foam highlights so the wave is clearly visible.
-  ctx.strokeStyle = 'rgba(229, 250, 255, 0.9)';
-  ctx.lineWidth = 3;
-  ctx.beginPath();
-  ctx.moveTo(x - (w * 0.35) * dir, y + h * 0.15);
-  ctx.quadraticCurveTo(x, y - h * 0.35, x + (w * 0.28) * dir, y + h * 0.1);
-  ctx.stroke();
-}
-
 function collectPickups() {
   arrays.hearts = arrays.hearts.filter((h) => {
     if (Math.hypot((player.x + player.w / 2) - h.x, (player.y + player.h / 2) - h.y) < 32) {
@@ -843,10 +768,6 @@ function drawWorld() {
     ctx.fill();
   }
 
-  for (const wave of arrays.waves) {
-    drawWaveSprite(wave);
-  }
-
   drawOrb();
 
   for (const p of arrays.particles) {
@@ -893,7 +814,6 @@ function step() {
   if (state.running && !state.pausedForLevelUp) {
     updatePlayer();
     updateOrb();
-    updateWaves();
     updateEnemies();
     updateProjectiles();
     updateParticles();
